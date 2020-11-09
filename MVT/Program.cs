@@ -73,10 +73,6 @@ public class Program
 
         LogManager.ReconfigExistingLoggers();
 
-        var eo = new EnumerationOptions();
-        eo.AttributesToSkip = FileAttributes.Directory;
-        eo.RecurseSubdirectories = true;
-
         var filePattern = "VERSION-*.txt";
         string dirName;
 
@@ -404,11 +400,6 @@ public class Program
 
         var filesToDelete = new List<string>();
         var dirsToDelete = new List<string>();
-
-        var eo = new EnumerationOptions();
-        eo.AttributesToSkip = 0;
-        eo.RecurseSubdirectories = true;
-
 
         foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",SearchOption.AllDirectories))
         {
