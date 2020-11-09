@@ -2,7 +2,7 @@
   "profiles": {
     "MVT": {
       "commandName": "Project",
-      "commandLineArgs": "-d E:\\Egnyte\\Shared\\Author_USB_Upload\\FOR498\\FOR498-USB\\FOR498-20-2B -o Validate"
+      "commandLineArgs": "-d D:\\Tools\\EvtxExplorer -o TrashDelete"
     }
   }
 }
