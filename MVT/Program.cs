@@ -343,13 +343,14 @@ public class Program
                         continue;
                     }
 
-                    var sha1 = GetSha256(fn);
+                    var sha256 = GetSha256(fn);
+                    l.Debug($"Calculated SHA256: {sha256}");
 
                     var key = fn.Replace(dirName, string.Empty);
 
-                    if (sha1 != fileList[key])
+                    if (sha256 != fileList[key])
                     {
-                        l.Fatal($"Hash mismatch for '{fn}'! Expected: '{fileList[key]}', Actual: '{sha1}'");
+                        l.Fatal($"Hash mismatch for '{fn}'! Expected: '{fileList[key]}', Actual: '{sha256}'");
                         violationFound = true;
                     }
                 }
