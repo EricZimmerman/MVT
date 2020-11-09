@@ -100,7 +100,7 @@ public class Program
 
                 if (Directory.Exists(DirName) == false)
                 {
-                    l.Fatal($"'{DirName} does not exist! Exiting\r\n");
+                    l.Fatal($"'{DirName}' does not exist! Exiting\r\n");
                     return;
                 }
 
@@ -123,7 +123,7 @@ public class Program
 
                 if (Directory.Exists(DirName) == false)
                 {
-                    l.Fatal($"'{DirName} does not exist! Exiting\r\n");
+                    l.Fatal($"'{DirName}' does not exist! Exiting\r\n");
                     return;
                 }
 
@@ -144,9 +144,9 @@ public class Program
                     return;
                 }
 
-                if (Directory.Exists(DirName) == false)
+                if (System.IO.Directory.Exists(DirName) == false)
                 {
-                    l.Fatal($"'{DirName} does not exist! Exiting\r\n");
+                    l.Fatal($"'{DirName}' does not exist! Exiting\r\n");
                     return;
                 }
 
@@ -231,7 +231,7 @@ public class Program
 
                 if (Directory.Exists(DirName) == false)
                 {
-                    l.Fatal($"'{DirName} does not exist! Exiting\r\n");
+                    l.Fatal($"'{DirName}' does not exist! Exiting\r\n");
                     return;
                 }
 
