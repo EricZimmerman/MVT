@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MVT": {
+      "commandName": "Project",
+      "commandLineArgs": "-f C:\\Temp\\out.txt -o Validate -d \"D:\\Egnyte\\Shared\\New Course Development\" --hash"
+    }
+  }
+}
