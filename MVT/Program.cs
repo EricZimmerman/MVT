@@ -31,6 +31,7 @@ public class Program
 {
     private static readonly string BaseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
+    
     [Option("-d|--dir",
         Description =
             "The directory containing files to recursively process. When using Generate, this is a required field.")]
@@ -47,8 +48,8 @@ public class Program
     public OpType Operation { get; }
 
     [Option("--hash",
-        Description = "If true, generate SHA256 for each file. If false, file list only. Default is false")]
-    public bool Hash { get; }
+        Description = "If set, generate SHA256 for each file, else, file list only.")]
+    public bool Hash { get; } 
 
     [Option("--debug", Description = "Show additional information while processing")]
     public bool Debug { get; }
