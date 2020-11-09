@@ -144,7 +144,7 @@ public class Program
                     return;
                 }
 
-                if (System.IO.Directory.Exists(DirName) == false)
+                if (Directory.Exists(DirName) == false)
                 {
                     l.Fatal($"'{DirName}' does not exist! Exiting\r\n");
                     return;
