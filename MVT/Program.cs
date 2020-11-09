@@ -47,9 +47,9 @@ public class Program
     [Option(Description = "Required. The Operation to perform")]
     public OpType Operation { get; }
 
-    [Option("--hash",
-        Description = "If set, generate SHA256 for each file, else, file list only.")]
-    public bool Hash { get; } 
+    [Option("--hash", CommandOptionType.SingleValue,
+        Description = "If true, generate SHA256 for each file. If false, file list only. Default is TRUE")]
+    public bool Hash { get; } = true;
 
     [Option("--debug", Description = "Show additional information while processing")]
     public bool Debug { get; }
