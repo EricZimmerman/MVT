@@ -24,8 +24,10 @@ using Path = Alphaleonis.Win32.Filesystem.Path;
 Remarks:
   Media Validation Tool
 
-- Generate|validate the contents of a directory based on file name
-- Calculate|validate all hashes of files in a directory.
+- Generate: Generate validation information about the contents of a directory based on file name
+- Validate: Validate all hashes of files (with --hash) in a directory or just validate file exists
+- Trash: Locate any trash files/folders as defined in Trash.txt
+- TrashDelete: Remove any trash files found
 
 This serves two purposes: 
 1) Are all files located in a directory that are expected to be there?
@@ -40,25 +42,30 @@ public class Program
     [Option("-d|--dir",Description = "The directory containing files to recursively process. When using Generate, this is a required field.")]
     public string DirName { get; }
 
-    [Required]
-    [Option("-f|--file",Description = "Required. The file name that contains information to validate, or the file to save generated data to")]
-    public string FileName { get; }
+   
+    [Option("-t|--tag",Description = "Required with Generate. The class-revision info to use in validation file, VERSION-{Tag}.txt. Any illegal characters will be replaced with _. Example: FOR498-20-2B")]
+    public string Tag { get; }
 
     [Required]
     [Option(Description = "Required. The Operation to perform")]
     public OpType Operation { get; }
 
-    [Option("--hash",Description = "If true, generate SHA-1 for each file. If false, file list only. Default is false")]
+    [Option("--hash",Description = "If true, generate SHA256 for each file. If false, file list only. Default is false")]
     public bool Hash { get; }
 
     [Option("--debug",Description = "Show additional information while processing")]
     public bool Debug { get; }
 
-    [Option("-t|--trash",Description = "Look for trash files as contained in trash.txt. This should contain one filename per line")]
-    public bool Trash { get; }
 
-    [Option("-c|--clean",Description = "Delete any trash files as contained in trash.txt. This should contain one filename per line")]
-    public bool CleanTrash { get; }
+    private void DumpHeader()
+    {
+        var l = LogManager.GetLogger("MVT");
+
+        l.Info($"MVT version {Assembly.GetExecutingAssembly().GetName().Version}");
+        l.Info($"Author: Eric Zimmerman (saericzimmerman@gmail.com)");
+        l.Info("Some url here for github repo");
+        l.Info("");
+    }
 
     private void OnExecute()
     {
@@ -75,29 +82,76 @@ public class Program
         var dirOptions = DirectoryEnumerationOptions.BasicSearch | DirectoryEnumerationOptions.Recursive |
                          DirectoryEnumerationOptions.Files;
 
+        var filePattern = "VERSION-*.txt";
+        var dirName = string.Empty;
+
+        Stopwatch sw;
+
         switch (Operation)
         {
+            case OpType.Trash:
+                break;
+            case OpType.TrashDelete:
+                break;
             case OpType.Generate:
+                DumpHeader();
+
                 if (string.IsNullOrEmpty(DirName))
                 {
-                    l.Fatal("-d is required when using Generate operation! Exiting");
+                    l.Fatal("-d is required when using 'Generate' operation! Exiting\r\n");
                     return;
                 }
 
-                var sw = new Stopwatch();
+                if (Directory.Exists(DirName) == false)
+                {
+                    l.Fatal($"'{DirName} does not exist! Exiting\r\n");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(Tag))
+                {
+                    l.Fatal("-t is required when using'Generate' operation! Exiting\r\n");
+                    return;
+                }
+
+                var tag = string.Join("_", Tag.Split(Path.GetInvalidFileNameChars()));  
+
+                dirName = DirName;
+                if (DirName.EndsWith(Path.DirectorySeparator) == false)
+                {
+                    dirName = $"{dirName}{Path.DirectorySeparator}";
+                }
+
+               
+
+                sw = new Stopwatch();
                 sw.Start();
 
-                var fileOut = new StreamWriter(FileName, false);
-                fileOut.WriteLine($"; MVT version { GetType().Assembly.GetName().Version.ToString()}");
+                var fileNameOut = Path.Combine(DirName, $"VERSION-{tag}.txt");
+
+                l.Info($"Validation data will be written to '{fileNameOut}'");
+                if (Hash)
+                {
+                   l.Info(" --hash option present. SHA256 will be generated for each file found.");
+                }
+                l.Info($"Iterating '{dirName}'...");
+
+                var fileOut = new StreamWriter(fileNameOut, false);
+                fileOut.WriteLine($"; MVT version {Assembly.GetExecutingAssembly().GetName().Version}");
                 fileOut.WriteLine($"; Generated on: {DateTimeOffset.UtcNow:yyyyMMddHHmmss.ffff}");
-                fileOut.WriteLine($"; Directory processed: '{DirName}'");
+                fileOut.WriteLine($"; Command line: {Environment.CommandLine}");
                 fileOut.WriteLine($"; Username: {Environment.UserName}");
-                fileOut.WriteLine("; Filename|SHA-1");
+                fileOut.WriteLine("; Filename|SHA256");
 
                 var fCount = 0;
                 long byteCount = 0;
-                foreach (var fn in Directory.EnumerateFileSystemEntries(DirName,dirOptions))
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,dirOptions))
                 {
+                    if (fn.Contains("VERSION-"))
+                    {
+                        continue;
+                    }
+
                     fCount += 1;
 
                     byteCount += new FileInfo(fn).Length;
@@ -105,11 +159,11 @@ public class Program
                     var hash = string.Empty;
                     if (Hash)
                     {
-                        hash = $"|{ GetSha1(fn)}";
+                        hash = $"|{ GetSha256(fn)}";
                     }
-                    fileOut.WriteLine($"{fn.Replace(DirName,"")}{hash}");
+                    fileOut.WriteLine($"{fn.Replace(dirName,"")}{hash}");
                     
-                    l.Debug($"'{fn.Replace(DirName,"")}'{hash}");
+                    l.Debug($"'{fn.Replace(dirName,"")}'{hash}");
                 }
 
                 fileOut.Flush();
@@ -121,13 +175,34 @@ public class Program
 
                 var Mb = byteCount / 1024 /1024;
 
-                l.Info($"Generate took {sw.Elapsed.TotalSeconds:N5} seconds ({(Mb/sw.Elapsed.TotalSeconds):N3} MB/sec across {fCount:N0} files). Results saved to '{FileName}'");
+                l.Info($"Generate took {sw.Elapsed.TotalSeconds:N5} seconds ({(Mb/sw.Elapsed.TotalSeconds):N3} MB/sec across {fCount:N0} files). Results saved to '{fileNameOut}'");
 
                 break;
             case OpType.Validate:
-                if (File.Exists(FileName) == false)
+                DumpHeader();
+
+                if (string.IsNullOrEmpty(DirName))
                 {
-                    Console.WriteLine($"'{FileName}' does not exist! Exiting");
+                    l.Fatal("-d is required when using 'Validate' operation! Exiting\r\n");
+                    return;
+                }
+
+                if (Directory.Exists(DirName) == false)
+                {
+                    l.Fatal($"'{DirName} does not exist! Exiting\r\n");
+                    return;
+                }
+
+                dirName = DirName;
+                if (DirName.EndsWith(Path.DirectorySeparator) == false)
+                {
+                    dirName = $"{dirName}{Path.DirectorySeparator}";
+                }
+
+                var validateFiles = Directory.GetFiles(dirName, filePattern);
+                if (validateFiles.Any() == false)
+                {
+                    l.Fatal($"'{dirName}' does not contain any validation files ({filePattern})! Did you forget to generate one?! Exiting\r\n");
                     return;
                 }
 
@@ -135,16 +210,47 @@ public class Program
                 
                 var filesNotInDirTree = new Dictionary<string, string>();
 
-                foreach (var fn in File.ReadAllLines(FileName))
+                var goodValidateFile = string.Empty;
+
+                foreach (var validateFile in validateFiles)
                 {
-                    if (fn.StartsWith(";"))
+                    var fline = File.ReadLines(validateFile).First();
+
+                    if (fline.Contains("MVT"))
+                    {
+                        goodValidateFile = validateFile;
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(goodValidateFile) == true)
+                {
+                    l.Warn($"Did not find a validation file generated by MVT! Exiting\r\n");
+                    return;
+                }
+
+                
+
+                l.Info($"Found validation file '{goodValidateFile}'. Reading...");
+
+                sw = new Stopwatch();
+                sw.Start();
+
+                foreach (var line in File.ReadLines(goodValidateFile))
+                {
+                    if (line.StartsWith(";"))
                     {
                         continue;
                     }
 
-                    if (fn.Contains("|"))
+                    if (line.Trim().Length == 0)
                     {
-                        var segs = fn.Split("|");
+                        continue;
+                    }
+                    
+                    if (line.Contains("|"))
+                    {
+                        var segs = line.Split("|");
                         fileList.Add(segs[0],segs[1]);
                         filesNotInDirTree.Add(segs[0],segs[1]);
                     }
@@ -152,42 +258,54 @@ public class Program
                     {
                         if (Hash)
                         {
-                            l.Warn($"'{FileName}' was not generated with hashes! Regenerate the file with hashes or remove --hash from command line");
+                            l.Warn($"\r\n'{goodValidateFile}' was not generated with hashes! Regenerate the file with hashes or remove --hash from command line\r\n");
                             return;
                         }
-                        fileList.Add(fn,string.Empty);
-                        filesNotInDirTree.Add(fn,string.Empty);
+                        fileList.Add(line,string.Empty);
+                        filesNotInDirTree.Add(line,string.Empty);
                     }
                 }
 
-                foreach (var fn in Directory.EnumerateFileSystemEntries(DirName, dirOptions))
+                l.Info($"Found {fileList.Count:N0} files in validation file. Iterating '{dirName}'...\r\n");
+
+                var violationFound = false;
+
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, dirOptions))
                 {
-                    if (fileList.ContainsKey(fn.Replace(DirName,string.Empty)) == false)
+                    if (fn.Contains("VERSION-"))
                     {
-                        l.Warn($"'{fn}' not found in validation file!");
                         continue;
                     }
 
-                    filesNotInDirTree.Remove(fn.Replace(DirName,string.Empty));
+                    if (fileList.ContainsKey(fn.Replace(dirName,string.Empty)) == false)
+                    {
+                        l.Fatal($"'{fn}' not found in validation file!");
+                        violationFound = true;
+                        continue;
+                    }
+
+                    filesNotInDirTree.Remove(fn.Replace(dirName,string.Empty));
 
                     if (!Hash)
                     {
                         continue;
                     }
 
-                    var sha1 = GetSha1(fn);
+                    var sha1 = GetSha256(fn);
 
-                    var key = fn.Replace(DirName, string.Empty);
+                    var key = fn.Replace(dirName, string.Empty);
 
                     if (sha1 != fileList[key])
                     {
                         l.Fatal($"Hash mismatch for '{fn}'! Expected: '{fileList[key]}', Actual: '{sha1}'");
+                        violationFound = true;
                     }
                 }
 
                 if (filesNotInDirTree.Count > 0)
                 {
-                    l.Warn("\r\nThe following files were not found in the directory tree, but are in the validation file");
+                    violationFound = true;
+                    l.Fatal("\r\nThe following files were found in the validation file, but are not in the directory tree");
                     foreach (var ent in filesNotInDirTree)
                     {
                         l.Info($"{ent.Key}");
@@ -195,14 +313,25 @@ public class Program
                     l.Info("");
                 }
 
+                sw.Stop();
+
+                if (violationFound)
+                {
+                    l.Fatal($"\r\nValidation failed! See output above for details...\r\n");
+                }
+                else
+                {
+                    l.Info($"\r\nValidation successful! No discrepancies detected\r\n");
+                }
+
                 break;
             
         }
     }
 
-    public string GetSha1(string filename)
+    public string GetSha256(string filename)
     {
-        using var sha = new System.Security.Cryptography.SHA1Managed();
+        using var sha = new System.Security.Cryptography.SHA256Managed();
 
         using var fs = File.OpenRead(filename);
 
@@ -253,5 +382,7 @@ public class Program
 public enum OpType
 {
     Generate,
-    Validate
+    Validate,
+    Trash,
+    TrashDelete
 }

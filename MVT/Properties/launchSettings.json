@@ -2,7 +2,7 @@
   "profiles": {
     "MVT": {
       "commandName": "Project",
-      "commandLineArgs": "-f C:\\Temp\\out.txt -o Validate -d \"D:\\Egnyte\\Shared\\New Course Development\" --hash"
+      "commandLineArgs": "-d E:\\Egnyte\\Shared\\Author_USB_Upload\\FOR498\\FOR498-USB\\FOR498-20-2B -o Validate"
     }
   }
 }

@@ -1,0 +1,7 @@
+﻿desktop.ini
+.DS_Store
+.Trashes
+._
+.fseventsd
+.Spotlight-V100
+System Volume Information
