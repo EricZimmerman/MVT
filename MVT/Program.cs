@@ -8,16 +8,10 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Alphaleonis.Win32.Filesystem;
-using Alphaleonis.Win32.Security;
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
-using Directory = Alphaleonis.Win32.Filesystem.Directory;
-using File = Alphaleonis.Win32.Filesystem.File;
-using FileInfo = Alphaleonis.Win32.Filesystem.FileInfo;
-using Path = Alphaleonis.Win32.Filesystem.Path;
 
 [Command(
     ExtendedHelpText = @"
@@ -79,8 +73,7 @@ public class Program
 
         LogManager.ReconfigExistingLoggers();
 
-        var dirOptions = DirectoryEnumerationOptions.BasicSearch | DirectoryEnumerationOptions.Recursive |
-                         DirectoryEnumerationOptions.Files;
+     
 
         var filePattern = "VERSION-*.txt";
         string dirName;
@@ -159,9 +152,9 @@ public class Program
                 var tag = string.Join("_", Tag.Split(Path.GetInvalidFileNameChars()));  
 
                 dirName = DirName;
-                if (DirName.EndsWith(Path.DirectorySeparator) == false)
+                if (DirName.EndsWith(Path.DirectorySeparatorChar) == false)
                 {
-                    dirName = $"{dirName}{Path.DirectorySeparator}";
+                    dirName = $"{dirName}{Path.DirectorySeparatorChar}";
                 }
 
                 sw = new Stopwatch();
@@ -185,10 +178,16 @@ public class Program
 
                 var fCount = 0;
                 long byteCount = 0;
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,dirOptions))
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName))
                 {
                     if (fn.Contains("VERSION-"))
                     {
+                        continue;
+                    }
+
+                    if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == new FileInfo(fn).Attributes)
+                    {
+                        l.Debug($"Skipping directory '{fn}'");
                         continue;
                     }
 
@@ -236,9 +235,9 @@ public class Program
                 }
 
                 dirName = DirName;
-                if (DirName.EndsWith(Path.DirectorySeparator) == false)
+                if (DirName.EndsWith(Path.DirectorySeparatorChar) == false)
                 {
-                    dirName = $"{dirName}{Path.DirectorySeparator}";
+                    dirName = $"{dirName}{Path.DirectorySeparatorChar}";
                 }
 
                 var validateFiles = Directory.GetFiles(dirName, filePattern);
@@ -312,7 +311,7 @@ public class Program
 
                 var violationFound = false;
 
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, dirOptions))
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName))
                 {
                     if (fn.Contains("VERSION-"))
                     {
@@ -378,8 +377,6 @@ public class Program
 
         l.Info($"Looking for trash in '{dirName}'...\r\n");
 
-        var dirOptions = DirectoryEnumerationOptions.BasicSearch | DirectoryEnumerationOptions.Recursive |
-                         DirectoryEnumerationOptions.FilesAndFolders;
 
         var trashCan = File.ReadAllLines(Path.Combine(BaseDirectory, "Trash.txt")).ToList();
 
@@ -395,7 +392,7 @@ public class Program
         var filesToDelete = new List<string>();
         var dirsToDelete = new List<string>();
 
-        foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, dirOptions))
+        foreach (var fn in Directory.EnumerateFileSystemEntries(dirName))
         {
             var a = new FileInfo(fn);
 
@@ -444,13 +441,13 @@ public class Program
         foreach (var file in filesToDelete)
         {
             l.Debug($"Deleting file '{file}'...");
-            File.Delete(file,true);
+            File.Delete(file);
         }
 
         foreach (var dir in dirsToDelete)
         {
             l.Debug($"Deleting directory '{dir}'...");
-            Directory.Delete(dir,true,true);
+            Directory.Delete(dir,true);
         }
         
         if (withDelete == false && foundFiles > 0)
