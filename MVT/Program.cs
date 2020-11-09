@@ -189,7 +189,7 @@ public class Program
                         continue;
                     }
 
-                    if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == new FileInfo(fn).Attributes)
+                    if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                     {
                         l.Debug($"Skipping directory '{fn}'");
                         continue;
@@ -324,7 +324,7 @@ public class Program
                         continue;
                     }
 
-                    if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == new FileInfo(fn).Attributes)
+                    if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                     {
                         l.Debug($"Skipping directory '{fn}'");
                         continue;
