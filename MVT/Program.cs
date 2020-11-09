@@ -73,7 +73,9 @@ public class Program
 
         LogManager.ReconfigExistingLoggers();
 
-     
+        var eo = new EnumerationOptions();
+        eo.AttributesToSkip = FileAttributes.Directory;
+        eo.RecurseSubdirectories = true;
 
         var filePattern = "VERSION-*.txt";
         string dirName;
@@ -178,18 +180,20 @@ public class Program
 
                 var fCount = 0;
                 long byteCount = 0;
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName))
+
+
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",eo))
                 {
                     if (fn.Contains("VERSION-"))
                     {
                         continue;
                     }
 
-                    if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == new FileInfo(fn).Attributes)
-                    {
-                        l.Debug($"Skipping directory '{fn}'");
-                        continue;
-                    }
+                    // if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == new FileInfo(fn).Attributes)
+                    // {
+                    //     l.Debug($"Skipping directory '{fn}'");
+                    //     continue;
+                    // }
 
                     fCount += 1;
 
@@ -311,7 +315,9 @@ public class Program
 
                 var violationFound = false;
 
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName))
+           
+
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",eo))
                 {
                     if (fn.Contains("VERSION-"))
                     {
@@ -392,7 +398,12 @@ public class Program
         var filesToDelete = new List<string>();
         var dirsToDelete = new List<string>();
 
-        foreach (var fn in Directory.EnumerateFileSystemEntries(dirName))
+        var eo = new EnumerationOptions();
+        eo.AttributesToSkip = 0;
+        eo.RecurseSubdirectories = true;
+
+
+        foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",eo))
         {
             var a = new FileInfo(fn);
 
