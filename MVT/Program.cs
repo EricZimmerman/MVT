@@ -182,18 +182,18 @@ public class Program
                 long byteCount = 0;
 
 
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",eo))
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",SearchOption.AllDirectories))
                 {
                     if (fn.Contains("VERSION-"))
                     {
                         continue;
                     }
 
-                    // if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == new FileInfo(fn).Attributes)
-                    // {
-                    //     l.Debug($"Skipping directory '{fn}'");
-                    //     continue;
-                    // }
+                    if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == new FileInfo(fn).Attributes)
+                    {
+                        l.Debug($"Skipping directory '{fn}'");
+                        continue;
+                    }
 
                     fCount += 1;
 
@@ -317,7 +317,7 @@ public class Program
 
            
 
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",eo))
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",SearchOption.AllDirectories))
                 {
                     if (fn.Contains("VERSION-"))
                     {
@@ -403,7 +403,7 @@ public class Program
         eo.RecurseSubdirectories = true;
 
 
-        foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",eo))
+        foreach (var fn in Directory.EnumerateFileSystemEntries(dirName,"*",SearchOption.AllDirectories))
         {
             var a = new FileInfo(fn);
 
