@@ -208,7 +208,7 @@ public class Program
                     }
                     fileOut.WriteLine($"{fn.Replace(dirName,"")}{hash}");
                     
-                    l.Debug($"'{fn.Replace(dirName,"")}'{hash}");
+                    l.Debug($"Writing to file: '{fn.Replace(dirName,"")}'{hash}");
                 }
 
                 fileOut.Flush();
