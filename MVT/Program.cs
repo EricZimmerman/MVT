@@ -324,6 +324,13 @@ public class Program
                         continue;
                     }
 
+                    if ((new FileInfo(fn).Attributes & FileAttributes.Directory) == new FileInfo(fn).Attributes)
+                    {
+                        l.Debug($"Skipping directory '{fn}'");
+                        continue;
+                    }
+
+
                     l.Debug($"Validating '{fn}'");
 
                     if (fileList.ContainsKey(fn.Replace(dirName,string.Empty)) == false)
