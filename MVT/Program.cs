@@ -30,7 +30,6 @@ This serves two purposes:
 public class Program
 {
     private static readonly string BaseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
     
     [Option("-d|--dir",
         Description =
@@ -58,8 +57,6 @@ public class Program
     {
         return CommandLineApplication.Execute<Program>(args);
     }
-
-
     private void DumpHeader()
     {
         var l = LogManager.GetLogger("MVT");
@@ -69,7 +66,6 @@ public class Program
         l.Info("https://github.com/EricZimmerman/MVT");
         l.Info("");
     }
-
     private void OnExecute()
     {
         SetupNLog();
@@ -172,7 +168,7 @@ public class Program
                 l.Info($"Validation data will be written to '{fileNameOut}'");
                 if (Hash)
                 {
-                    l.Info(" --hash option enabled. SHA256 will be generated for each file found.");
+                    l.Info("\t--hash option enabled. SHA256 will be generated for each file found.");
                 }
 
                 l.Info($"\r\nIterating '{dirName}'...");
@@ -186,7 +182,6 @@ public class Program
 
                 var fCount = 0;
                 long byteCount = 0;
-
 
                 foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*", SearchOption.AllDirectories))
                 {
@@ -326,7 +321,6 @@ public class Program
 
                 var violationFound = false;
 
-
                 foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*", SearchOption.AllDirectories))
                 {
                     if (fn.Contains("VERSION-"))
@@ -339,7 +333,6 @@ public class Program
                         l.Debug($"Skipping directory '{fn}'");
                         continue;
                     }
-
 
                     l.Debug($"Validating '{fn}'");
 
@@ -362,11 +355,13 @@ public class Program
 
                     var key = fn.Replace(dirName, string.Empty);
 
-                    if (sha256 != fileList[key])
+                    if (sha256 == fileList[key])
                     {
-                        l.Fatal($"Hash mismatch for '{fn}'! Expected: '{fileList[key]}', Actual: '{sha256}'");
-                        violationFound = true;
+                        continue;
                     }
+
+                    l.Fatal($"Hash mismatch for '{fn}'! Expected: '{fileList[key]}', Actual: '{sha256}'");
+                    violationFound = true;
                 }
 
                 if (filesNotInDirTree.Count > 0)
@@ -494,14 +489,16 @@ public class Program
 
         var outPath = Path.Combine(BaseDirectory, "Trash.txt");
 
-        var contents = new List<string>();
-        contents.Add("desktop.ini");
-        contents.Add(".DS_Store");
-        contents.Add(".Trashes");
-        contents.Add("._");
-        contents.Add(".fseventsd");
-        contents.Add(".Spotlight-V100");
-        contents.Add("System Volume Information");
+        var contents = new List<string>
+        {
+            "desktop.ini",
+            ".DS_Store",
+            ".Trashes",
+            "._",
+            ".fseventsd",
+            ".Spotlight-V100",
+            "System Volume Information"
+        };
 
         File.WriteAllLines(outPath, contents);
     }
