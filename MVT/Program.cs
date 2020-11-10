@@ -172,7 +172,7 @@ public class Program
                 l.Info($"Validation data will be written to '{fileNameOut}'");
                 if (Hash)
                 {
-                    l.Info(" --hash option present. SHA256 will be generated for each file found.");
+                    l.Info(" --hash option enabled. SHA256 will be generated for each file found.");
                 }
 
                 l.Info($"\r\nIterating '{dirName}'...");
