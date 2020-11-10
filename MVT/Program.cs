@@ -168,7 +168,7 @@ public class Program
                 l.Info($"Validation data will be written to '{fileNameOut}'");
                 if (Hash)
                 {
-                    l.Info("\t--hash option enabled. SHA256 will be generated for each file found.");
+                    l.Error("\t--hash option enabled. SHA256 will be generated for each file found.");
                 }
 
                 l.Info($"\r\nIterating '{dirName}'...");
@@ -338,7 +338,7 @@ public class Program
 
                     if (fileList.ContainsKey(fn.Replace(dirName, string.Empty)) == false)
                     {
-                        l.Fatal($"'{fn}' not found in validation file!");
+                        l.Fatal($"File '{fn}' not found in validation file!");
                         violationFound = true;
                         continue;
                     }
@@ -368,10 +368,10 @@ public class Program
                 {
                     violationFound = true;
                     l.Fatal(
-                        "\r\nThe following files were found in the validation file, but are not in the directory tree");
+                        "\r\nThe following files were found in the validation file, but are not in the directory tree:");
                     foreach (var ent in filesNotInDirTree)
                     {
-                        l.Info($"{ent.Key}");
+                        l.Error($"{ent.Key}");
                     }
 
                     l.Info("");
@@ -385,7 +385,7 @@ public class Program
                 }
                 else
                 {
-                    l.Info("\r\nValidation successful! No discrepancies detected\r\n");
+                    l.Info("Validation successful! No discrepancies detected\r\n");
                 }
 
                 break;
