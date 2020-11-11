@@ -317,7 +317,7 @@ public class Program
 
                     if (fileList.ContainsKey(fn.Replace(dirName, string.Empty)) == false)
                     {
-                        l.Fatal($"File '{fn}' not found in validation file!");
+                        l.Error($"File '{fn}' not found in validation file!");
                         violationFound = true;
                         continue;
                     }
