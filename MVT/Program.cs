@@ -173,7 +173,7 @@ public class Program
 
                 l.Info($"\r\nIterating '{dirName}'...");
 
-                var fileOut = new StreamWriter(fileNameOut, false);
+                var fileOut = new StreamWriter(fileNameOut, false,Encoding.Unicode);
                 fileOut.WriteLine($"; MVT version {Assembly.GetExecutingAssembly().GetName().Version}");
                 fileOut.WriteLine($"; Generated on: {DateTimeOffset.UtcNow:yyyyMMddHHmmss.ffff}");
                 fileOut.WriteLine($"; Command line: {Environment.CommandLine}");
@@ -223,7 +223,7 @@ public class Program
                 var Mb = byteCount / 1024 / 1024;
 
                 l.Info(
-                    $"Generate took {sw.Elapsed.TotalSeconds:N5} seconds ({Mb / sw.Elapsed.TotalSeconds:N3} MB/sec across {fCount:N0} files). Results saved to '{fileNameOut}'\r\n");
+                    $"Generate took {sw.Elapsed.TotalSeconds:N2} seconds ({Mb / sw.Elapsed.TotalSeconds:N3} MB/sec across {fCount:N0} files/{Mb:N0} MB). Results saved to '{fileNameOut}'\r\n");
 
                 break;
             case OpType.Validate:
@@ -284,7 +284,7 @@ public class Program
                 sw = new Stopwatch();
                 sw.Start();
 
-                foreach (var line in File.ReadLines(goodValidateFile))
+                foreach (var line in File.ReadLines(goodValidateFile,Encoding.Unicode))
                 {
                     if (line.StartsWith(";"))
                     {
@@ -398,7 +398,7 @@ public class Program
 
         l.Info($"Looking for trash in '{dirName}'...\r\n");
         
-        var trashCan = File.ReadAllLines(Path.Combine(BaseDirectory, "Trash.txt")).ToList();
+        var trashCan = File.ReadAllLines(Path.Combine(BaseDirectory, "Trash.txt"),Encoding.Unicode).ToList();
 
         var trashHash = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -500,7 +500,7 @@ public class Program
             "System Volume Information"
         };
 
-        File.WriteAllLines(outPath, contents);
+        File.WriteAllLines(outPath, contents,Encoding.Unicode);
     }
 
     public string GetSha256(string filename)
