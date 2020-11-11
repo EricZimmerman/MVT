@@ -31,15 +31,16 @@ public class Program
 {
     private static readonly string BaseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     
+    [Required]
     [Option("-d|--dir",
         Description =
-            "The directory containing files to recursively process. When using Generate, this is a required field.")]
+            "Required. The directory containing files to recursively process")]
     public string DirName { get; }
 
 
     [Option("-t|--tag",
         Description =
-            "Required with Generate. The class-revision info to use in validation file, VERSION-{Tag}.txt. Any illegal characters will be replaced with _. Example: FOR498-20-2B")]
+            "Required with Generate. The 'Class-Revision' info to use in validation file, VERSION-{Tag}.txt. Any illegal characters will be replaced with _. Example: FOR498-20-2B")]
     public string Tag { get; }
 
     [Required]
@@ -88,12 +89,6 @@ public class Program
             case OpType.Trash:
                 DumpHeader();
 
-                if (string.IsNullOrEmpty(DirName))
-                {
-                    l.Fatal("-d is required when using 'Generate' operation! Exiting\r\n");
-                    return;
-                }
-
                 if (Directory.Exists(DirName) == false)
                 {
                     l.Fatal($"'{DirName}' does not exist! Exiting\r\n");
@@ -111,12 +106,6 @@ public class Program
             case OpType.TrashDelete:
                 DumpHeader();
 
-                if (string.IsNullOrEmpty(DirName))
-                {
-                    l.Fatal("-d is required when using 'Generate' operation! Exiting\r\n");
-                    return;
-                }
-
                 if (Directory.Exists(DirName) == false)
                 {
                     l.Fatal($"'{DirName}' does not exist! Exiting\r\n");
@@ -133,12 +122,6 @@ public class Program
                 break;
             case OpType.Generate:
                 DumpHeader();
-
-                if (string.IsNullOrEmpty(DirName))
-                {
-                    l.Fatal("-d is required when using 'Generate' operation! Exiting\r\n");
-                    return;
-                }
 
                 if (Directory.Exists(DirName) == false)
                 {
@@ -228,12 +211,6 @@ public class Program
                 break;
             case OpType.Validate:
                 DumpHeader();
-
-                if (string.IsNullOrEmpty(DirName))
-                {
-                    l.Fatal("-d is required when using 'Validate' operation! Exiting\r\n");
-                    return;
-                }
 
                 if (Directory.Exists(DirName) == false)
                 {
