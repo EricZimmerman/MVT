@@ -17,14 +17,16 @@ using NLog.Targets;
 Remarks:
   Media Validation Tool
 
-- Generate: Generate validation information about the contents of a directory based on file name
-- Validate: Validate all hashes of files (with --hash) in a directory or just validate file exists
-- Trash: Locate any trash files/folders as defined in Trash.txt
-- TrashDelete: Remove any trash files found
+- Generate: Generate validation information about the contents of a directory based on file name/hash
+- Validate: Validate presence of/hash of files in a directory (or just validate file exists with --hash false)
+- Trash: Locate any trash files/folders as defined in 'Trash.txt'
+- TrashDelete: Remove any trash files/folders found as defined in 'Trash.txt'
 
-This serves two purposes: 
-1) Are all files located in a directory that are expected to be there?
-2) Do all the file hashes in a directory match the expected hashes?
+Features: 
+1) Report files in VERSION file not in directory
+2) Report files in directory not in VERSION file
+3) Report hash mismatches (optional)
+4) Report file names that do not match based on capitalization
 "
 )]
 public class Program
