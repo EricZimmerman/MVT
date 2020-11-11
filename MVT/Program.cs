@@ -264,7 +264,7 @@ public class Program
                 foreach (var validateFile in validateFiles)
                 {
                     l.Debug($"Examining validation file '{validateFile}'...");
-                    var fline = File.ReadLines(validateFile).First();
+                    var fline = File.ReadLines(validateFile,Encoding.Unicode).First();
 
                     if (fline.Contains("MVT"))
                     {
