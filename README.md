@@ -12,4 +12,4 @@ Once a validation file is generated, the directory can be compared to a previous
 
 Can also locate non-desirable files and delete them.
 
-This is a .net Core 3.1 project. Tested on both Windows 10 and Ubuntu 20.04
+This is a **.net 5** project. Tested on both Windows 10 and Ubuntu 20.04
