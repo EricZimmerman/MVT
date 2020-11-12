@@ -31,7 +31,7 @@ Features:
 )]
 public class Program
 {
-    private static readonly string BaseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    private static readonly string BaseDirectory = AppContext.BaseDirectory;// Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     
     [Required]
     [Option("-d|--dir",
