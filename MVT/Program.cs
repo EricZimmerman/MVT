@@ -171,7 +171,7 @@ public class Program
 
                 var fileOut = new StreamWriter(fileNameOut, false,Encoding.Unicode);
                 fileOut.WriteLine($"; MVT version {Assembly.GetExecutingAssembly().GetName().Version}");
-                fileOut.WriteLine($"; Generated on: {DateTimeOffset.UtcNow:yyyyMMddHHmmss.ffff}");
+                fileOut.WriteLine($"; Generated on: {DateTimeOffset.UtcNow:yyyy-MM-dd HH:mm:ss.ffff}");
                 fileOut.WriteLine($"; Command line: {Environment.CommandLine}");
                 fileOut.WriteLine($"; Username: {Environment.UserName}");
                 fileOut.WriteLine("; Filename|SHA256");
