@@ -179,7 +179,16 @@ public class Program
                 var fCount = 0;
                 long byteCount = 0;
 
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*", SearchOption.AllDirectories))
+                var opt = new EnumerationOptions
+                {
+                    RecurseSubdirectories = true,
+                    ReturnSpecialDirectories = false,
+                    
+                    AttributesToSkip = 0, //Default is opt.AttributesToSkip = FileAttributes.Hidden | FileAttributes.System, but we do not want to skip anything unless we do not have access
+                    IgnoreInaccessible = true
+                };
+
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*",opt))
                 {
                     if (fn.Contains("VERSION-"))
                     {

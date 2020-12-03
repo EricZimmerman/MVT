@@ -2,7 +2,7 @@
   "profiles": {
     "MVT": {
       "commandName": "Project",
-      "commandLineArgs": "-d D:\\Tools\\EvtxExplorer -o Generate -t Foo"
+      "commandLineArgs": "-d E:\\ -o Generate -t Foo --hash false"
     }
   }
 }
