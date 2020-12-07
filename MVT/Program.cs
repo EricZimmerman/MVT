@@ -71,6 +71,16 @@ public class Program
         l.Info("https://github.com/EricZimmerman/MVT");
         l.Info("");
     }
+
+    private readonly EnumerationOptions _opt = new EnumerationOptions
+    {
+        RecurseSubdirectories = true,
+        ReturnSpecialDirectories = false,
+                    
+        AttributesToSkip = 0, //Default is opt.AttributesToSkip = FileAttributes.Hidden | FileAttributes.System, but we do not want to skip anything unless we do not have access
+        IgnoreInaccessible = true
+    };
+
     private void OnExecute()
     {
         SetupNLog();
@@ -87,6 +97,8 @@ public class Program
         string dirName;
 
         Stopwatch sw;
+
+     
 
         switch (Operation)
         {
@@ -179,16 +191,8 @@ public class Program
                 var fCount = 0;
                 long byteCount = 0;
 
-                var opt = new EnumerationOptions
-                {
-                    RecurseSubdirectories = true,
-                    ReturnSpecialDirectories = false,
-                    
-                    AttributesToSkip = 0, //Default is opt.AttributesToSkip = FileAttributes.Hidden | FileAttributes.System, but we do not want to skip anything unless we do not have access
-                    IgnoreInaccessible = true
-                };
 
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*",opt))
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*",_opt))
                 {
                     if (fn.Contains("VERSION-"))
                     {
@@ -336,7 +340,9 @@ public class Program
 
                 var violationFound = false;
 
-                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*", SearchOption.AllDirectories))
+              
+
+                foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*", _opt))
                 {
                     if (fn.Contains("VERSION-"))
                     {
@@ -427,7 +433,7 @@ public class Program
         var filesToDelete = new List<string>();
         var dirsToDelete = new List<string>();
 
-        foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*", SearchOption.AllDirectories))
+        foreach (var fn in Directory.EnumerateFileSystemEntries(dirName, "*", _opt))
         {
             var a = new FileInfo(fn);
 
