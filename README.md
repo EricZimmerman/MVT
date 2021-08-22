@@ -1,5 +1,7 @@
 # MVT (Media Validation Tool)
 
+Run `.\MVT.exe --help` to see the command line options listed below.
+
 ## Command Line Interface
 
      Usage: MVT [options]
