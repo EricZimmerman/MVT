@@ -44,7 +44,7 @@ Once a validation file is generated, the directory can be compared to a previous
 
 Can also locate non-desirable files and delete them.
 
-This is a **.NET 5** project. Tested on both Windows 10, macOS, and Ubuntu 20.04!
+This is a **.NET 6** project. Tested on both Windows 10, macOS, and Ubuntu 20.04!
 
 Note that the Release binaries for 0.5.0.1 are self contained and no runtime needs to be installed on end points. This is why they are large. Releases may not always be that way, but its an experiment and so far, its worked.
 
